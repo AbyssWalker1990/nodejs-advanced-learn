@@ -1,15 +1,21 @@
 const puppeteer = require('puppeteer')
 
-test('Add tho numvers', () => {
-    const sum = 1 + 3
+let browser, page
 
-    expect(sum).toEqual(4)
+beforeEach(async () => {
+    browser = await puppeteer.launch({
+        headless: false
+    })
+    page = await browser.newPage()
+    await page.goto('localhost:3000')
+})
+
+afterEach(async () => {
+    await browser.close()
 })
 
 test('Can open browser', async () => {
-    const browser = await puppeteer.launch({
-        headless: false
-    })
 
-    const page = await browser.newPage()
+    const text = await page.$eval('a.brand-logo', el => el.innerHTML)
+    expect(text).toEqual('Blogster')
 })
