@@ -14,8 +14,36 @@ afterEach(async () => {
     await browser.close()
 })
 
-test('Can open browser', async () => {
+test('The header has the correct name', async () => {
 
     const text = await page.$eval('a.brand-logo', el => el.innerHTML)
     expect(text).toEqual('Blogster')
+})
+
+test('Log in button leads to gogle OAuth', async () => {
+    const click = await page.click('.right a')
+
+    await expect(page.url()).toMatch(/accounts\.google\.com/)
+})
+
+test.only('When sign in, shows logout button', async () => {
+    const id = '656b2a7f007361290c0b2041'
+
+    const Buffer = require('safe-buffer').Buffer
+    const sessionObject = {
+        passport: {
+            user: id
+        }
+    }
+    const sessionString = Buffer.from(JSON.stringify(sessionObject)).toString('base64')
+
+    const Keygrip = require('keygrip')
+    const keys = require('../config/keys')
+    const keygrip = new Keygrip([keys.cookieKey])
+    const sig = keygrip.sign('session=' + sessionString)
+
+    await page.setCookie({ name: 'session', value: sessionString })
+    await page.setCookie({ name: 'session.sig', value: sig })
+
+    await page.goto('localhost:3000')
 })
