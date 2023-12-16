@@ -26,7 +26,7 @@ test('Log in button leads to gogle OAuth', async () => {
     await expect(page.url()).toMatch(/accounts\.google\.com/)
 })
 
-test.only('When sign in, shows logout button', async () => {
+test('When sign in, shows logout button', async () => {
     const id = '656b2a7f007361290c0b2041'
 
     const Buffer = require('safe-buffer').Buffer
@@ -44,6 +44,10 @@ test.only('When sign in, shows logout button', async () => {
 
     await page.setCookie({ name: 'session', value: sessionString })
     await page.setCookie({ name: 'session.sig', value: sig })
-
     await page.goto('localhost:3000')
+    await page.waitFor('a[href="/auth/logout"]')
+
+    const text = await page.$eval('a[href="/auth/logout"]', el => el.innerHTML)
+
+    expect(text).toEqual('Logout')
 })
